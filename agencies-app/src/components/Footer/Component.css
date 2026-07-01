@@ -1,0 +1,123 @@
+.site-footer {
+  padding: 94px 0 42px;
+  background: #ffffff;
+}
+
+.site-footer[data-reveal] {
+  --reveal-distance: 34px;
+}
+
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.3fr) minmax(140px, 0.7fr) minmax(220px, 0.9fr) minmax(140px, 0.7fr);
+  gap: 58px;
+  align-items: start;
+}
+
+.site-footer__logo {
+  display: inline-flex;
+  color: var(--color-text);
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.site-footer__brand p {
+  max-width: 360px;
+  margin-top: 22px;
+  color: var(--color-muted);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.site-footer h2 {
+  color: var(--color-text);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.site-footer ul,
+.site-footer address {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+  font-style: normal;
+}
+
+.site-footer a,
+.site-footer address span {
+  color: var(--color-muted);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+  transition: color 220ms var(--ease-premium), transform 220ms var(--ease-premium);
+}
+
+.site-footer a:hover {
+  color: var(--color-text);
+  transform: translate3d(0, -1px, 0);
+}
+
+.site-footer__bottom {
+  margin-top: 74px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-border);
+}
+
+.site-footer__bottom p {
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .site-footer {
+    padding-top: 82px;
+  }
+
+  .site-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 44px 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    padding: 72px 0 36px;
+  }
+
+  .site-footer__grid {
+    grid-template-columns: 1fr;
+    gap: 38px;
+    text-align: center;
+  }
+
+  .site-footer__brand p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .site-footer ul,
+  .site-footer address {
+    align-items: center;
+    gap: 15px;
+  }
+
+  .site-footer a,
+  .site-footer address span {
+    min-height: 24px;
+  }
+
+  .site-footer__bottom {
+    margin-top: 54px;
+    text-align: center;
+  }
+}
