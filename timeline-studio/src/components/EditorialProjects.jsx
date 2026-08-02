@@ -2,12 +2,15 @@ import { useEffect, useRef } from "react";
 import frame01 from "../assets/editorial/frame-01.jpg";
 import frame02 from "../assets/editorial/frame-02.jpg";
 import frame03 from "../assets/editorial/frame-03.jpg";
+import { transitionEditorialTracks } from "../data/transitionEditorial";
 
 const clamp = (value) => Math.max(0, Math.min(1, value));
+const trackNames = ["one", "two", "three", "four"];
 
 export default function EditorialProjects() {
   const wrapper = useRef(null);
   const poster = useRef(null);
+  const tracks = useRef([]);
   useEffect(() => {
     const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
     let frame = 0;
@@ -37,12 +40,19 @@ export default function EditorialProjects() {
         "--type-stage-visibility",
         stageExit >= 0.999 ? "hidden" : "visible",
       );
-      const rowSpecs = [
-        { enter: 0.04, startX: 8, endX: -6, pinnedX: -6 },
-        { enter: 0.1, startX: -12, endX: 4, pinnedX: 6 },
-        { enter: 0.16, startX: 5, endX: -4, pinnedX: -4 },
-        { enter: 0.22, startX: -6, endX: 3, pinnedX: 4 },
-      ];
+      const rowSpecs = innerWidth <= 700
+        ? [
+            { enter: 0.04, startX: 5, endX: -7, pinnedX: -2 },
+            { enter: 0.1, startX: -6, endX: 5, pinnedX: 2 },
+            { enter: 0.16, startX: 4, endX: -6, pinnedX: -2 },
+            { enter: 0.22, startX: -5, endX: 4, pinnedX: 2 },
+          ]
+        : [
+            { enter: 0.04, startX: 8, endX: -6, pinnedX: -6 },
+            { enter: 0.1, startX: -12, endX: 4, pinnedX: 6 },
+            { enter: 0.16, startX: 5, endX: -4, pinnedX: -4 },
+            { enter: 0.22, startX: -6, endX: 3, pinnedX: 4 },
+          ];
       rowSpecs.forEach((spec, index) => {
         const incoming = ease(clamp((transition - spec.enter) / 0.2));
         const horizontalProgress = ease(transition);
@@ -62,6 +72,18 @@ export default function EditorialProjects() {
           `--track-${index + 1}-clip`,
           `${reducedMotion ? 0 : (1 - incoming) * 100}%`,
         );
+        tracks.current[index]?.querySelectorAll(".inline-editorial-media").forEach((media, mediaIndex) => {
+          const reveal = reducedMotion
+            ? 1
+            : ease(clamp((incoming - mediaIndex * 0.1) / 0.7));
+          const drift = reducedMotion
+            ? 0
+            : (horizontalProgress - 0.5) * (mediaIndex % 2 ? -18 : 18);
+          media.style.setProperty("--inline-reveal", reveal);
+          media.style.setProperty("--inline-clip", `${(1 - reveal) * 100}%`);
+          media.style.setProperty("--inline-scale", 0.88 + reveal * 0.12);
+          media.style.setProperty("--inline-drift", `${drift}px`);
+        });
       });
       if (reducedMotion) {
         const collage = ease(clamp((transition - 0.92) / 0.08));
@@ -123,34 +145,38 @@ export default function EditorialProjects() {
     <div ref={wrapper} className="editorial-scroll">
       <section ref={poster} className="editorial" aria-labelledby="cuts-title">
         <div className="editorial-type-stage" aria-hidden="true">
-          <div className="editorial-track track-one">
-            <div className="type-track-inner">
-              <span>FASHION FILMS,</span>
-              <img src={frame01} alt="" width="1200" height="1500" />
-              <span>MUSIC VIDEOS, BRAND STORIES, SHORT FILMS,</span>
+          {transitionEditorialTracks.map((track, trackIndex) => (
+            <div
+              className={`editorial-track track-${trackIndex + 1} track-${trackNames[trackIndex]}`}
+              key={trackIndex}
+              ref={(node) => { tracks.current[trackIndex] = node; }}
+            >
+              <div className="type-track-inner">
+                {track.map((item, itemIndex) => item.type === "text" ? (
+                  <span key={`${item.value}-${itemIndex}`}>{item.value}</span>
+                ) : (
+                  <span
+                    className={`inline-editorial-media${item.mobile ? "" : " mobile-hide"}`}
+                    key={item.id}
+                    style={{
+                      "--inline-ratio": item.ratio,
+                      "--inline-position": item.position,
+                      "--inline-height": `${item.displayHeight}em`,
+                    }}
+                  >
+                    <img
+                      src={item.src}
+                      alt={item.alt}
+                      loading={item.eager ? "eager" : "lazy"}
+                      fetchPriority={item.eager ? "high" : "auto"}
+                      width={item.width}
+                      height={item.height}
+                    />
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="editorial-track track-two">
-            <div className="type-track-inner">
-              <span>COMMERCIALS, DOCUMENTARIES,</span>
-              <img src={frame02} alt="" width="736" height="899" />
-              <span>SOCIAL CUTS, SOUND DESIGN, CAMPAIGNS,</span>
-            </div>
-          </div>
-          <div className="editorial-track track-three">
-            <div className="type-track-inner">
-              <span>EDITING, RHYTHM, COLOR,</span>
-              <img src={frame03} alt="" width="790" height="1053" />
-              <span>SOUND, MOVEMENT, MEMORY, FRAME BY FRAME</span>
-            </div>
-          </div>
-          <div className="editorial-track track-four">
-            <div className="type-track-inner">
-              <span>VISUAL STORIES, CAMPAIGNS,</span>
-              <img src={frame01} alt="" width="1200" height="1500" />
-              <span>EDITING, MOVEMENT, CUT AFTER CUT</span>
-            </div>
-          </div>
+          ))}
         </div>
         <div className="poster-title">
           <p>SELECTED FRAMES FROM THE TIMELINE</p>

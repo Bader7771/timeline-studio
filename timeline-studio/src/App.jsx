@@ -3,6 +3,8 @@ import Header from "./components/Header";
 import EditingHalo from "./components/EditingHalo";
 import InteractionLabel from "./components/InteractionLabel";
 import EditorialProjects from "./components/EditorialProjects";
+import ProjectsLayer from "./components/projects/ProjectsLayer";
+import Footer from "./components/Footer";
 import { siteContent } from "./data/siteContent";
 import "./styles/global.css";
 
@@ -10,7 +12,7 @@ export default function App() {
   const [interacted, setInteracted] = useState(false);
   const markInteracted = useCallback(() => setInteracted(true), []);
   return (
-    <div className="experience">
+    <div id="top" className="experience">
       <div className="hero-layer">
         <div className="site-shell">
           <Header
@@ -28,6 +30,11 @@ export default function App() {
         </div>
       </div>
       <EditorialProjects />
+      <ProjectsLayer />
+      <Footer
+        instagram={siteContent.footer.instagram}
+        email={siteContent.footer.email}
+      />
     </div>
   );
 }

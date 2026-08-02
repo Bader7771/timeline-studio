@@ -91,7 +91,7 @@ export default function EditingHalo({ onInteract }) {
     scene.add(floor);
 
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.35 : 1.75));
     host.appendChild(renderer.domElement);
@@ -119,6 +119,7 @@ export default function EditingHalo({ onInteract }) {
       explosionStart = -1,
       frame = 0,
       running = true,
+      intersecting = true,
       start = performance.now();
     const pointAt = (index, time, out) => {
       const angle = (index / count) * Math.PI * 2;
@@ -238,13 +239,19 @@ export default function EditingHalo({ onInteract }) {
         explode();
       }
     };
-    const visibility = () => {
-      running = !document.hidden;
-      if (running) {
-        start = performance.now();
-        frame = requestAnimationFrame(render);
-      } else cancelAnimationFrame(frame);
+    const syncRendering = () => {
+      const shouldRun = !document.hidden && intersecting;
+      if (shouldRun === running) return;
+      running = shouldRun;
+      cancelAnimationFrame(frame);
+      if (running) frame = requestAnimationFrame(render);
     };
+    const visibility = () => syncRendering();
+    const viewportObserver = new IntersectionObserver(([entry]) => {
+      intersecting = entry.isIntersecting;
+      syncRendering();
+    });
+    viewportObserver.observe(host);
     resize();
     addEventListener("resize", resize);
     host.addEventListener("pointermove", pointerMove);
@@ -264,6 +271,7 @@ export default function EditingHalo({ onInteract }) {
       host.removeEventListener("pointercancel", pointerUp);
       host.removeEventListener("keydown", keyDown);
       document.removeEventListener("visibilitychange", visibility);
+      viewportObserver.disconnect();
       geometry.dispose();
       material.dispose();
       floorGeometry.dispose();

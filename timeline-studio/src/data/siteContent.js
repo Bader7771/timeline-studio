@@ -4,4 +4,8 @@ export const siteContent = {
   contact: {
     email: "hello@timeline-studio.com",
   },
+  footer: {
+    instagram: "#",
+    email: "mailto:hello@timeline-studio.com",
+  },
 };
