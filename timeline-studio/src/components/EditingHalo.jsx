@@ -30,6 +30,7 @@ export default function EditingHalo({ onInteract }) {
     }
 
     const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarsePointer = matchMedia("(pointer: coarse), (hover: none)").matches;
     const mobile = innerWidth < 700;
     const count = mobile ? 34 : 58;
     const scene = new THREE.Scene();
@@ -37,6 +38,8 @@ export default function EditingHalo({ onInteract }) {
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
     camera.position.set(0, 0.15, mobile ? 13.5 : 11.2);
     const group = new THREE.Group();
+    group.scale.setScalar(mobile ? 0.58 : 1);
+    group.position.set(0, mobile ? -0.05 : 0, 0);
     scene.add(group);
 
     const shape = new THREE.Shape();
@@ -93,7 +96,7 @@ export default function EditingHalo({ onInteract }) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.35 : 1.75));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.25 : 1.75));
     host.appendChild(renderer.domElement);
     const canvas = renderer.domElement;
     canvas.setAttribute("aria-hidden", "true");
@@ -188,11 +191,17 @@ export default function EditingHalo({ onInteract }) {
     };
     const resize = () => {
       const { width, height } = host.getBoundingClientRect();
+      const mobileFrame = width <= 700;
+      group.scale.setScalar(mobileFrame ? 0.58 : 1);
+      group.position.set(0, mobileFrame ? -0.05 : 0, 0);
+      camera.fov = mobileFrame ? 36 : 32;
+      camera.position.z = mobileFrame ? 14.8 : 11.2;
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
     };
     const pointerMove = (event) => {
+      if (coarsePointer || event.pointerType === "touch") return;
       const box = host.getBoundingClientRect();
       pointer.tx = ((event.clientX - box.left) / box.width) * 2 - 1;
       pointer.ty = -(((event.clientY - box.top) / box.height) * 2 - 1);
@@ -212,6 +221,7 @@ export default function EditingHalo({ onInteract }) {
       }
     };
     const pointerDown = (event) => {
+      if (coarsePointer || event.pointerType === "touch") return;
       drag.active = true;
       drag.moved = false;
       drag.x = drag.startX = event.clientX;
@@ -226,6 +236,7 @@ export default function EditingHalo({ onInteract }) {
       }
     };
     const pointerUp = (event) => {
+      if (coarsePointer || event.pointerType === "touch") return;
       if (!drag.active) return;
       drag.active = false;
       velocityYaw = clamp(drag.vx, -0.055, 0.055);

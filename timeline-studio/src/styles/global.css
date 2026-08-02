@@ -1742,3 +1742,17 @@ main {
   .projects-intro { height: clamp(400px, 72svh, 560px); }
   .project-grid { margin-top: -7svh; }
 }
+
+@media (max-width: 700px) and (orientation: portrait) {
+  .hero-layer,
+  .site-shell {
+    height: 88svh;
+  }
+  .site-shell {
+    min-height: min(480px, 88svh);
+  }
+  .threejs-wrapper,
+  .threejs-wrapper canvas {
+    touch-action: pan-y;
+  }
+}
